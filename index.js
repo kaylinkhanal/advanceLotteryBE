@@ -88,8 +88,13 @@ app.post('/winner',async(req, res)=> {
 
 app.post('/register',async(req, res)=> {
     try{
-        const usersList = await Users.find()
-        //findOne
+        const usersList = await Users.findOne({name: req.body.name})
+        if(usersList){
+            res.json({
+                msg: 'User Name already exist'
+            })
+        }else{
+    
         const data = await Users.create(req.body)
         if(data){
             res.json({
@@ -100,6 +105,8 @@ app.post('/register',async(req, res)=> {
                 msg: 'registration failed'
             })
         }
+        }
+
     }catch(err){
         console.log(err)
     }
