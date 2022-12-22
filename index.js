@@ -46,6 +46,27 @@ app.post('/tickets',(req, res)=> {
   console.log(req)
 })
 
+app.get('/users',async (req, res)=> {
+  const usersList = await Users.findOne({name: req.query.name})
+  const searchWinColor = await Winner.findOne({ticketNo: req.query.ticketNo})
+  if(searchWinColor?.color === req.query.color && usersList){
+    res.json({
+        msg: "hurray! wiiner winner chicken dinner"
+    })
+  }else{
+      if(!usersList){
+          res.json({
+            errMsg: 'not registered'
+          })
+      }else{
+          res.json({
+              errMsg: 'you have lost'
+          })
+      }
+  }
+
+})
+
 const usersSchema = new Schema({
     name: {type:String, unique: true},
     ticketNo: Number
@@ -113,6 +134,13 @@ app.post('/register',async(req, res)=> {
   
   })
   
+  app.put('/register',async(req, res)=> {
+//req.bodyt
+
+//task : save it in db not with await Users.create(req.body)
+//we have to update await Users.findOneAndUpdate
+  
+  })
 
 
 app.listen(port, () => {
