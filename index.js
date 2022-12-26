@@ -6,9 +6,9 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(cors())
 const mongoose = require('mongoose')
-const Connect = require('./db/connect')
-const Users = require('./models/users')
-const Winner = require('./models/winner')
+const Connect = require('./src/db/connect')
+const Users = require('./src/models/users')
+const Winner = require('./src/models/winner')
 
 const { Schema } = mongoose;
 
