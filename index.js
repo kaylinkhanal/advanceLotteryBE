@@ -1,27 +1,18 @@
-const e = require('express')
-const express = require('express')
-const app = express()
-const port = 3000
+const app = require('express')()
+require('dotenv').config()
+const port = process.env.PORT
 const cors = require('cors')
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(cors())
 const mongoose = require('mongoose')
+const Connect = require('./db/connect')
+const Users = require('./models/users')
+const Winner = require('./models/winner')
+
 const { Schema } = mongoose;
 
-
-const connect=async()=>{
-    try{
-        await mongoose.connect('mongodb://127.0.0.1:27017/winticket', {useNewUrlParser: true, useUnifiedTopology: true});
-        console.log("connected to mongodb");
-    }catch(error){
-        console.error(error);
-    }
-  }
-
-  connect()
-
-
+Connect()
 
 
 app.get('/ticket', async(req, res) => {
@@ -47,43 +38,38 @@ app.post('/tickets',(req, res)=> {
 })
 
 app.get('/users',async (req, res)=> {
-  const usersList = await Users.findOne({name: req.query.name})
-  const searchWinColor = await Winner.findOne({ticketNo: req.query.ticketNo})
-  if(searchWinColor?.color === req.query.color && usersList){
-    res.json({
-        msg: "hurray! wiiner winner chicken dinner"
-    })
-  }else{
-      if(!usersList){
+    if(req.query.name){
+        const usersList = await Users.findOne({name: req.query.name})
+        const searchWinColor = await Winner.findOne({ticketNo: req.query.ticketNo})
+        if(searchWinColor?.color === req.query.color && usersList){
           res.json({
-            errMsg: 'not registered'
+              msg: "hurray! wiiner winner chicken dinner"
           })
-      }else{
-          res.json({
-              errMsg: 'you have lost'
-          })
-      }
-  }
+        }else{
+            if(!usersList){
+                res.json({
+                  errMsg: 'not registered'
+                })
+            }else{
+                res.json({
+                    errMsg: 'you have lost'
+                })
+            }
+        }
+    }else{
+        const usersList = await Users.find()
+        res.json({
+            usersList: usersList
+        })
+
+    }
+
 
 })
 
-const usersSchema = new Schema({
-    name: {type:String, unique: true},
-    ticketNo: Number
-  },
-  { collection: 'users' });
-
-const Users = mongoose.model('Users', usersSchema);
 
 
 
-const winnerSchema = new Schema({
-    color: {type:String},
-    ticketNo: Number
-  },
-  { collection: 'winner' });
-
-const Winner = mongoose.model('Winner', winnerSchema);
 
 
 app.post('/winner',async(req, res)=> {
